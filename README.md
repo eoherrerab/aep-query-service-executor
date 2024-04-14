@@ -8,8 +8,6 @@ AEP Query Service Executor es un script que permite la ejecución de sentencias 
 
 -  **Sin limites de líneas por consulta:** la documentación menciona que, al ejecutar una sentencia, la cantidad máxima que puede retornar mediante la interfaz gráfica proporcionada son 50.000 líneas, que a su vez se traducen en registros. Este script utiliza las palabras claves LIMIT y FETCH para obtener lotes de 50.000 registros hasta obtener la cantidad total de registros que debe de traer la consulta.
 
--  **Capacidad de ser implementado en Adobe I/O Runtime:** dado que este script está escrito totalmente en NodeJS, puede ser implementado mediante un proyecto de Adobe I/O Runtime para creación de reportes de manera automatizada.
-
 ## Configuración
 
 Una vez posea los archivos del repositorio en su entorno local, se accede a la carpeta *config* del mismo y, dependiendo del método de autenticación a utilizar, se debe cambiar el nombre del archivo correspondiente a *aep.env*. Actualmente se manejan los métodos de autenticación dispuestos por Adobe, JWT y Oauth, relacionados a los archivos *aep_jwt.env* y *aep_oauth.env* respectivamente, ubicados en la carpeta *config*.
