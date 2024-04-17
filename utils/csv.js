@@ -57,9 +57,6 @@ function write_csv_file(file_name, rows){
         /*Se ejecuta código independiente de si la ejecución anterior fue exitosa o no*/
         }finally{
 
-            /*Se muestra en consola el error obtenido*/
-            //console.error(error)
-
             /*Se retorna la respuesta a la función original*/
             return is_writing_done
 
