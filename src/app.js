@@ -103,7 +103,7 @@ async function main(){
                     /*Se define una variable que contiene la información de los resultados de la sentencia*/
                     let query_results = await postgresql.execute_query(parameters_requests_response.data, query_template)
 
-                    
+                    /*Se crea el archivo CSV con las líneas obtenidas de los resultados de la setencia*/
                     csv.write_csv_file(query_template.id + "_At_" + date.get_datetime() + ".csv", query_results)
 
                 }
