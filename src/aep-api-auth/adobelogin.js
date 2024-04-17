@@ -159,6 +159,7 @@ async function generate_access_token_using_oauth(){
     }
 }
 
+/*Se definen las funciones a exportar*/
 module.exports = {
     generate_json_web_token: generate_json_web_token,
     generate_access_token_using_jwt: generate_access_token_using_jwt,
