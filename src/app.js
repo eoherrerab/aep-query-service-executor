@@ -8,9 +8,9 @@ const query_service = require('./aep-api/query_service.js')
 const sql_tools = require('../utils/sql.js')
 /*Se importa el módulo que permite conectar a base de datos postgresql y ejecutar sentencias SQL */
 const postgresql = require('../src/postgresql/postgresql.js')
-
+/*Se importa el módulo que permite obtener la fecha y ahora actual como marca de tiempo*/
 const date = require('../utils/date.js')
-
+/*Se importa el módulo que permite crear archivos CSV*/
 const csv = require('../utils/csv.js')
 
 /*Se establece la configuración del archivo que contiene las variables de ambiente*/
