@@ -23,8 +23,16 @@ function write_csv_file(file_name, rows){
         try{
 
             /*Se define una variable que contiene la ruta de almacenamiento del archivo CSV*/
-            const csv_file = path.resolve(__dirname, path.join(".." ,process.env.FOLDER_PATH, file_name))
+            const csv_file = path.resolve(__dirname, path.join("..", process.env.FOLDER_PATH, file_name))
             
+            /*Se evalua si la ruta de almacenamiento del archivo no existe*/
+            if (!fs.existsSync(path.resolve(__dirname, path.join("..", process.env.FOLDER_PATH)))) {
+    
+                /*Si la ruta de almacenamiento no existe, se genera la ruta*/
+                fs.mkdirSync(path.resolve(__dirname, path.join("..", process.env.FOLDER_PATH)));
+            
+            }
+
             /*Se define una variable que contiene el flujo de escritura*/
             const csv_stream = csv.format({ headers: true })
         
