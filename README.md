@@ -48,7 +48,7 @@ A partir del archivo que se haya renombrado como *aep.env*, se debe de ingresar 
 |SANDBOX_NAME|Nombre distintivo del ambiente sobre cual se realizan las consultas. Por defecto, al contratar Adobe Experience Platform, se crea un ambiente productivo con nombre distintivo *prod*|Se obtiene mediante la opción de Sandboxes, dentro de la categoría Administration del menú de Adobe Experience Platform|
 |QUERY_TEMPLATES_IDS|Un Query Template ID es un valor formado, normalmente, por letras, en minúsculas, y números, en conjuntos de caracteres separados por guiones. Cada uno de estos Query Template ID debe ir separado del resto usando el caracter de coma|Se obtiene mediante cada una de las plantillas de consulta a ejecutar creadas en Queries, dentro de la categoría Data Management del menú de en Adobe Experience Platform|
 
-Posterior a esto, se accede al archivo *csv.env* y se debe de ingresar las configuraciones requeridas en dicho archivo. A continuación se describe la información de cada campo en el archivo:
+Posteriormente, se accede al archivo *csv.env* y se debe de ingresar las configuraciones requeridas en dicho archivo. A continuación se describe la información de cada campo en el archivo:
 
 ### Campos para archivo .env de exportación a CSV
 
