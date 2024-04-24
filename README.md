@@ -69,3 +69,5 @@ Finalmente, se accede al archivo *pg.env* y se debe de ingresar las configuracio
 - Solamente puede ejecutar de tipo SELECT. Esto para evitar crear sentencias, como UPDATE O DELETE, que puedan alterar la estructura y estabilidad de la base de datos y, en consecuencia, la instancia de Adobe Experience Platform.
 
 - Las sentencias no pueden contener FETCH, LIMIT, OFFSET u otras palabras claves que cumplan estas funciones. Esto es debido a que, como se mencionó anteriormente, este script utiliza palabras claves LIMIT y OFFSET para obtener los valores completos de la sentencia, superando ese limite de 50000 registros por consulta.
+
+- Actualmente, no está soportado el uso de consultas parametrizadas. Esto es una funcionalidad relativamente nueva y, en consecuencia, no se tiene muy estudiada. Una vez se entienda a plenitud su comportamiento se hará una actualización que soporte esta opción. 
