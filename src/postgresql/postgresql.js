@@ -25,15 +25,22 @@ function is_query_result_over_yet(sql_query_result_row_count){
 
 }
 
+/*Se define una función de reemplazo de parámetros de la consulta*/
 function replace_sql_query_parameters(sql_query, sql_query_parameters){
     
+    /*Se define una variable que contiene la consulta*/
     let sql_query_with_replaced_parameters = sql_query
     
+    /*Se realiza una iteración sobre cada parámetro de consulta*/
     for(const sql_query_parameter of Object.keys(sql_query_parameters)){
         
+        /*Se establece la variable definida anteriormente como la misma, pero
+        reemplazando el parámetro de consulta con su valor correspondiente*/
         sql_query_with_replaced_parameters = sql_query_with_replaced_parameters.replace("$" + sql_query_parameter, sql_query_parameters[sql_query_parameter])
+    
     }
     
+    /*Se retorna la consulta a la función original*/
     return sql_query_with_replaced_parameters
 }
 
@@ -71,14 +78,20 @@ async function execute_query(connection_parameters, query_template){
         a desde qué línea se debe tomar la información de registros*/
         let offset = 0
 
+        /*Se define una variable que contiene la sentencia*/
         let sql_query
 
+        /*Se evalua si la plantilla contiene parámetros de consulta*/
         if(query_template['queryParameters']){
 
+            /*Si se cumple esta condición, se establece la variable definida anteriormente a
+            partir de la función de obtención y reemplazo de parámetros de consulta*/
             sql_query = replace_sql_query_parameters(query_template['sql'], query_template['queryParameters'])
 
         }else{
 
+            /*Si no se cumple esta condición, se establece la variable definida anteriormente
+            como la consulta SQL proveniente de la plantilla de consulta*/
             sql_query = query_template['sql']
 
         }
