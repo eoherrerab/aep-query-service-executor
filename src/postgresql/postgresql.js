@@ -25,6 +25,18 @@ function is_query_result_over_yet(sql_query_result_row_count){
 
 }
 
+function replace_sql_query_parameters(sql_query, sql_query_parameters){
+    
+    let sql_query_with_replaced_parameters = sql_query
+    
+    for(const sql_query_parameter of Object.keys(sql_query_parameters)){
+        
+        sql_query_with_replaced_parameters = sql_query_with_replaced_parameters.replace("$" + sql_query_parameter, sql_query_parameters[sql_query_parameter])
+    }
+    
+    return sql_query_with_replaced_parameters
+}
+
 /*Se define una función de ejecución de sentencias*/
 async function execute_query(connection_parameters, query_template){
     
@@ -59,13 +71,25 @@ async function execute_query(connection_parameters, query_template){
         a desde qué línea se debe tomar la información de registros*/
         let offset = 0
 
+        let sql_query
+
+        if(query_template['queryParameters']){
+
+            sql_query = replace_sql_query_parameters(query_template['sql'], query_template['queryParameters'])
+
+        }else{
+
+            sql_query = query_template['sql']
+
+        }
+
         /*Este fragmento de código se ejecuta, al menos, una
         vez dado que la consulta se realiza al menos una vez*/
         do{
             
             /*Se establece la respuesta de la sentencia al realizar
             la consulta sobre la conexión a la base de datos*/
-            query_results = await client.query(query_template['sql'] + ` LIMIT ${limit} OFFSET ${offset}`)
+            query_results = await client.query(sql_query + ` LIMIT ${limit} OFFSET ${offset}`)
 
             /*Se establece que la variable que contiene la cantidad total de registros es la
             variable misma, en concatenación con los registros obtenidos en la respuesta anterior*/
