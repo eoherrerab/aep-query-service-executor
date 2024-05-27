@@ -53,7 +53,7 @@ function generate_json_web_token(){
     }catch(error){
 
         /*Se muestra en consola el error obtenido*/
-        //console.error(error)
+        console.error(error)
 
         /*Se despliega una excepción asociada al error obtenido*/
         throw error
@@ -97,7 +97,7 @@ async function generate_access_token_using_jwt(json_web_token){
         response = error.response
 
         /*Se muestra en consola el error obtenido*/
-        //console.error(error)
+        console.error(error)
 
         /*Se despliega una excepción asociada al error obtenido*/
         throw error
@@ -146,7 +146,7 @@ async function generate_access_token_using_oauth(){
         response = error.response
 
         /*Se muestra en consola el error obtenido*/
-        //console.error(error)
+        console.error(error)
 
         /*Se despliega una excepción asociada al error obtenido*/
         throw error

@@ -3,6 +3,10 @@ const dotenv = require('dotenv')
 /*Se importa el módulo que permite conectar con bases de datos postgresql*/
 const pg = require('pg')
 
+const date = require('../../utils/date.js')
+
+const csv = require('../../utils/csv.js')
+
 /*Se establece la configuración del archivo que contiene las variables de ambiente*/
 dotenv.config({path: ['config/pg.env']})
 
@@ -49,19 +53,20 @@ async function execute_query(connection_parameters, query_template){
     
     /*Se define una variable que contiene los parámetros requeridos para conectar con la base de datos postgresql*/
     const client = new pg.Client({
-        'user': connection_parameters['username'],
-        'host': connection_parameters['host'],
-        'database': connection_parameters['dbName'],
-        'password': connection_parameters['token'],
-        'port': connection_parameters['port'],
+        'user': connection_parameters.username,
+        'host': connection_parameters.host,
+        'database': connection_parameters.dbName,
+        'password': connection_parameters.token,
+        'port': connection_parameters.port,
         'ssl': true
     })
 
-    /*Se define una variable que contiene la cantidad total de registros de las respuestas de la sentencia*/
-    let total_query_results_rows = []
+    let is_querying_done = false
 
     /*Se define una variable que contiene la respuesta de la sentencia*/
     let query_results
+
+    let csv_file_name = query_template.id + "_At_" + date.get_datetime() + ".csv"
 
     /*Se despliega un fragmento de código con un try...catch*/
     try{
@@ -82,32 +87,37 @@ async function execute_query(connection_parameters, query_template){
         let sql_query
 
         /*Se evalua si la plantilla contiene parámetros de consulta*/
-        if(query_template['queryParameters']){
+        if(query_template.queryParameters){
 
             /*Si se cumple esta condición, se establece la variable definida anteriormente a
             partir de la función de obtención y reemplazo de parámetros de consulta*/
-            sql_query = replace_sql_query_parameters(query_template['sql'], query_template['queryParameters'])
+            sql_query = replace_sql_query_parameters(query_template.sql, query_template.queryParameters)
 
         }else{
 
             /*Si no se cumple esta condición, se establece la variable definida anteriormente
             como la consulta SQL proveniente de la plantilla de consulta*/
-            sql_query = query_template['sql']
+            sql_query = query_template.sql
 
         }
 
         /*Este fragmento de código se ejecuta, al menos, una
         vez dado que la consulta se realiza al menos una vez*/
         do{
-            
+
             /*Se establece la respuesta de la sentencia al realizar
             la consulta sobre la conexión a la base de datos*/
             query_results = await client.query(sql_query + ` LIMIT ${limit} OFFSET ${offset}`)
 
-            /*Se establece que la variable que contiene la cantidad total de registros es la
-            variable misma, en concatenación con los registros obtenidos en la respuesta anterior*/
-            total_query_results_rows = total_query_results_rows.concat(query_results.rows)
+            if(query_results.rows){
 
+                if(query_results.rows.length > 0){
+
+                    csv.write_csv_file(csv_file_name, query_results.rows)
+                
+                }
+            }
+            
             /*Se establece la variable como la variable misma,
             más la suma del límite para cada iteración*/
             offset = offset + limit
@@ -115,6 +125,8 @@ async function execute_query(connection_parameters, query_template){
         /*Este fragmento de código se ejecuta, al menos una vez, y mientras no se llegue
         al final de los registros que se obtienen de respuesta de la sentencia*/
         }while(!is_query_result_over_yet(query_results.rowCount))
+
+        is_querying_done = true
 
     /*Se realiza una obtención del error ocurrido*/
     }catch(error){
@@ -137,7 +149,7 @@ async function execute_query(connection_parameters, query_template){
         }
 
         /*Se retorna la respuesta de la sentencia a la función original*/
-        return total_query_results_rows
+        return is_querying_done
 
     }
 

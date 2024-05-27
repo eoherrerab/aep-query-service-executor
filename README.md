@@ -6,9 +6,9 @@ AEP Query Service Executor es un script que permite la ejecución de sentencias 
 
 -  **Conexión directa con PostgreSQL:** como lo específica la documentación, los conjuntos de datos, sean creados por los usuarios de Experience Platform a partir de esquemas o los conjuntos de datos del sistema, están almacenados en una base de datos que se ejecuta mediante PostgreSQL. Este script utiliza los servicios proporcionados por Query Service API, obteniendo las credenciales para crear una conexión directa a la base de datos, permitiendo una ejecución más rápida de las sentencias que, de igual manera, se obtienen mediante los servicios de Query Service API.
 
--  **Sin limites de líneas por consulta:** la documentación menciona que, al ejecutar una sentencia, la cantidad máxima de líneas que puede retornar mediante la interfaz gráfica proporcionada son 50.000, que a su vez se traducen en registros. Este script utiliza las palabras claves LIMIT y FETCH para obtener lotes de 50.000 registros hasta obtener la cantidad total de registros que debe de traer la consulta.
+-  **Sin limites de líneas por consulta:** la documentación menciona que, al ejecutar una sentencia, la cantidad máxima de líneas que puede retornar mediante la interfaz gráfica proporcionada son 500, que a su vez se traducen en registros. Este script utiliza las palabras claves LIMIT y FETCH para obtener lotes de registros hasta obtener la cantidad total de registros que debe de traer la consulta.
 
-- **Exportación de consultas a archivo CSV:** la documentación menciona que, si se desea exportar los resultados de una sentencia, se puede utilizar la opción de CREATE TABLE AS SELECT (CTAS), para convertir los resultados de la sentencia en un conjunto de datos Ad Hoc para, posteriormente, exportarlo a un servidor SFTP o servicio en la nube mediante la opción de destinos, lo que se traduce en trabajo adicional para visualizar todos los resultados obtenidos. Este script utiliza el módulo *fast-csv* para exportar los resultados de la sentencia en un archivo separado por caracteres (CSV) que se almacenará en la carpeta definida.
+- **Exportación de consultas a archivo CSV:** la documentación aclara que, si se desea exportar los resultados de una sentencia, se puede utilizar la opción de CREATE TABLE AS SELECT (CTAS), para convertir los resultados de la sentencia en un conjunto de datos Ad Hoc para, posteriormente, exportarlo a un servidor SFTP o servicio en la nube mediante la opción de destinos, lo que se traduce en trabajo adicional para visualizar todos los resultados obtenidos. Este script utiliza el módulo *fast-csv* para exportar los resultados de la sentencia en un archivo separado por caracteres (CSV) que se almacenará en la carpeta definida.
 
 ## Requerimientos
 
@@ -69,3 +69,7 @@ Finalmente, se accede al archivo *pg.env* y se debe de ingresar las configuracio
 - Solamente puede ejecutar de tipo SELECT. Esto para evitar crear sentencias, como UPDATE O DELETE, que puedan alterar la estructura y estabilidad de la base de datos y, en consecuencia, la instancia de Adobe Experience Platform.
 
 - Las sentencias no pueden contener FETCH, LIMIT, OFFSET u otras palabras claves que cumplan estas funciones. Esto es debido a que, como se mencionó anteriormente, este script utiliza palabras claves LIMIT y OFFSET para obtener los valores completos de la sentencia, superando ese limite de 50000 registros por consulta.
+
+## Casos de uso
+
+- **Reportería completa:** como indica la documentación, al ejecutar una consulta de tipo SELECT en el editor de consultas de Adobe Experience Platform, se permite visualizar un máximo de 500 registros. Esta cantidad, en caso de consultas realizadas a conjuntos de datos con una gran número de datos, puede no ser suficiente evidencia al momento de una toma de decisiones a nivel de negocio. Este script permite obtener la cantidad total de registros asociada a la consulta a través de un sistema de trabajo por lotes.

@@ -36,7 +36,7 @@ async function get_postgresql_connection_parameters(access_token){
         response = error.response
 
         /*Se muestra en consola el error obtenido*/
-        //console.error(error)
+        console.error(error)
 
         /*Se despliega una excepción asociada al error obtenido*/
         throw error

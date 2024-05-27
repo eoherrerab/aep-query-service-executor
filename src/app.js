@@ -8,10 +8,6 @@ const query_service = require('./aep-api/query_service.js')
 const sql_tools = require('../utils/sql.js')
 /*Se importa el módulo que permite conectar a base de datos postgresql y ejecutar sentencias SQL */
 const postgresql = require('../src/postgresql/postgresql.js')
-/*Se importa el módulo que permite obtener la fecha y ahora actual como marca de tiempo*/
-const date = require('../utils/date.js')
-/*Se importa el módulo que permite crear archivos CSV*/
-const csv = require('../utils/csv.js')
 
 /*Se establece la configuración del archivo que contiene las variables de ambiente*/
 dotenv.config({path: ['config/aep.env']})
@@ -50,7 +46,7 @@ async function main(){
 
             /*Se define una variable que contiene la información de la respuesta de
             la petición especificamente el valor correspondiente al token de acceso*/
-            let access_token = token_request_response.data['access_token']
+            let access_token = token_request_response.data.access_token
 
             /*Se define una variable que contiene las ID de las plantillas de las sentencias*/
             let query_templates_ids = process.env.QUERY_TEMPLATES_IDS.split(",")
@@ -73,16 +69,16 @@ async function main(){
                 partir de la función de obtención de información de las plantillas de sentencias,
                 con un token de acceso y la ID de la plantilla de sentencia como parámetro*/
                 let template_request_response = await query_service.get_query_template(access_token, query_template_id)
-            
+                
                 /*Se evalua si la respuesta de la petición fue exitosa*/
                 if(template_request_response.status == 200){
-
+                    
                     /*Se evalua si la sentencia SQL es de tipo SELECT y no contiene palabras claves OFFSET o LIMIT*/
                     if (sql_tools.is_sql_select_query(template_request_response.data.sql) && !sql_tools.contains_offset_query(template_request_response.data.sql)){
-
+                        
                         /*Se agrega la información de la plantilla de sentencia a la variable definida anteriormente*/
                         query_templates.push(template_request_response.data)
-
+                        
                     }
 
                 }
@@ -101,10 +97,7 @@ async function main(){
                 if(parameters_requests_response.status == 200){
 
                     /*Se define una variable que contiene la información de los resultados de la sentencia*/
-                    let query_results = await postgresql.execute_query(parameters_requests_response.data, query_template)
-
-                    /*Se crea el archivo CSV con las líneas obtenidas de los resultados de la setencia*/
-                    csv.write_csv_file(query_template.id + "_At_" + date.get_datetime() + ".csv", query_results)
+                    await postgresql.execute_query(parameters_requests_response.data, query_template)
 
                 }
 

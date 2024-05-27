@@ -22,33 +22,54 @@ function write_csv_file(file_name, rows){
         /*Se despliega un fragmento de código con un try...catch*/
         try{
 
-            /*Se define una variable que contiene la ruta de almacenamiento del archivo CSV*/
-            const csv_file = path.resolve(__dirname, path.join("..", process.env.FOLDER_PATH, file_name))
-            
+            /*Se define una variable que contiene la ruta de la carpeta donde se guardan los archivos CSV*/
+            const csv_folder_path = path.resolve(__dirname, "..", process.env.FOLDER_PATH)
+
+            /*Se define una variable que contiene la ruta del archivo CSV a generar*/
+            const csv_file_path = path.resolve(csv_folder_path, file_name)            
+
             /*Se evalua si la ruta de almacenamiento del archivo no existe*/
-            if (!fs.existsSync(path.resolve(__dirname, path.join("..", process.env.FOLDER_PATH)))) {
+            if (!fs.existsSync(csv_folder_path)) {
     
                 /*Si la ruta de almacenamiento no existe, se genera la ruta*/
-                fs.mkdirSync(path.resolve(__dirname, path.join("..", process.env.FOLDER_PATH)));
+                fs.mkdirSync(csv_folder_path)
             
             }
 
-            /*Se define una variable que contiene el flujo de escritura*/
-            const csv_stream = csv.format({ headers: true })
-        
+            /*Se define una variable que contiene el flujo de escritura basado en archivos*/
+            const writing_stream = fs.createWriteStream(csv_file_path, {flags: 'a', encoding: 'utf8'})
+
+            /*Se define una variable que contiene el flujo de escritura del archivo CSV*/
+            let csv_writing_stream
+
+            /*Se evalua si la ruta del archivo CSV a generar existe*/
+            if (fs.existsSync(csv_file_path)){
+
+                /*Si la ruta del archivo existe, se establece la variable definida anteriormente
+                como el flujo de escritura del archivo CSV sin cabeceras activas*/
+                csv_writing_stream = csv.format({ headers: false, includeEndRowDelimiter: true})
+
+            }else{
+
+                /*Si la ruta del archivo no, se establece la variable definida anteriormente
+                como el flujo de escritura del archivo CSV con cabeceras activas*/
+                csv_writing_stream = csv.format({ headers: true, includeEndRowDelimiter: true})
+
+            }
+
             /*Se hace una iteración sobre todas las líneas a escribir en el archivo CSV*/
             for(const row of rows){
 
                 /*Se escribe la línea en el archivo CSV*/
-                csv_stream.write(row)
+                csv_writing_stream.write(row)
 
             }
 
-            /*Se utiliza una tubería para definir la codificación del archivo*/
-            csv_stream.pipe(fs.createWriteStream(csv_file,{ encoding: 'utf8'}))
+            /*Se utiliza una tubería para definir la codificación y modo del archivo*/
+            csv_writing_stream.pipe(writing_stream)
         
             /*Se finaliza el flujo de escritura*/
-            csv_stream.end()
+            csv_writing_stream.end()
 
             /*Se establece la variable definida anteriormente como valor true */
             is_writing_done = true
@@ -57,7 +78,7 @@ function write_csv_file(file_name, rows){
         }catch(error){
             
             /*Se muestra en consola el error obtenido*/
-            //console.error(error)
+            console.error(error)
             
             /*Se despliega una excepción asociada al error obtenido*/
             throw error
