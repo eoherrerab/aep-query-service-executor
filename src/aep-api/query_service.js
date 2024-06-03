@@ -33,6 +33,7 @@ async function get_postgresql_connection_parameters(access_token){
     /*Se realiza una obtención del error ocurrido*/
     }catch(error){
 
+        /*Se establece la variable definida anteriormente como la respuesta del error*/
         response = error.response
 
         /*Se muestra en consola el error obtenido*/
@@ -76,6 +77,7 @@ async function get_query_template(access_token, query_template_id){
     /*Se realiza una obtención del error ocurrido*/
     }catch(error){
 
+        /*Se establece la variable definida anteriormente como la respuesta del error*/
         response = error.response
 
         /*Se muestra en consola el error obtenido*/
