@@ -1,5 +1,7 @@
 /*Se importa el módulo que permite cargar las variables de ambiente*/
 const dotenv = require('dotenv')
+/*Se importa el módulo que permite manipular arreglos*/
+const underscore = require('underscore')
 /*Se importa el módulo que permite generar tokens de acceso para Experience Platform API*/
 const access_token_generator = require('./aep-api-auth/adobelogin.js')
 /*Se importa el módulo que permite interactuar con la Query Service API de Experience Platform*/
@@ -58,49 +60,34 @@ async function main(){
             /*Se establece la variable definida anteriormente como la misma, removiendo los elementos que sean vacíos*/
             query_templates_ids = query_templates_ids.filter(query_template_id => query_template_id != "")
 
-            /*Se define una variable que contiene la información de las plantillas de las sentencias*/
-            let query_templates = []
+            /*Se establece la variable definida anteriormente como la misma, removiendo los elementos repetidos*/
+            query_templates_ids = underscore.uniq(query_templates_ids)
 
-            /*Se hace una iteración sobre todos los elementos de la
-            variable que contiene las ID de las plantillas de sentencias*/
-            for(const query_template_id of query_templates_ids){
+            /*Se define una variable que contiene la información de las plantillas de las sentencias a partir de la función
+            asincrónica de obtención de información de las plantillas de sentencias, con un token de acceso y la ID de la
+            plantilla como parámetro*/
+            let query_templates = await Promise.all(query_templates_ids.map(query_template_id => query_service.get_query_template(access_token, query_template_id)))
 
-                /*Se define una variable que contiene la respuesta de la petición que se obtiene a
-                partir de la función de obtención de información de las plantillas de sentencias,
-                con un token de acceso y la ID de la plantilla de sentencia como parámetro*/
-                let template_request_response = await query_service.get_query_template(access_token, query_template_id)
+            /*Se establece la variable definida anteriormente como la misma, removiendo las peticiones no exitosas*/
+            query_templates = query_templates.filter(query_template => query_template.status == 200)
+
+            /*Se establece la variable definida anteriormente como la misma, removiendo las sentencias que no sea de tipo SELECT*/
+            query_templates =  query_templates.filter(query_template => sql_tools.is_sql_select_query(query_template.data.sql))
+
+            /*Se establece la variable definida anteriormente como la misma, removiendo las sentencias que contengan palabras como OFFSET, LIMIT, etc.*/
+            query_templates =  query_templates.filter(query_template => !sql_tools.contains_offset_query(query_template.data.sql))
+
+            /*Se define una variable que contiene la respuesta de la petición que se obtiene a partir de la
+            función de obtención de credenciales de acceso a postgreslq, con un token de acceso como parámetro*/
+            let parameters_requests_response = await query_service.get_postgresql_connection_parameters(access_token)
+
+            /*Se evalua si la respuesta de la petición fue exitosa*/
+            if(parameters_requests_response.status == 200){
+
+                /*Se ejecuta la función asincrónica de consulta en la base de datos,
+                con los datos de conexión y la plantilla de sentencia como parámetro*/
+                await Promise.all(query_templates.map(query_template => postgresql.execute_query(parameters_requests_response.data, query_template.data)))
                 
-                /*Se evalua si la respuesta de la petición fue exitosa*/
-                if(template_request_response.status == 200){
-                    
-                    /*Se evalua si la sentencia SQL es de tipo SELECT y no contiene palabras claves OFFSET o LIMIT*/
-                    if (sql_tools.is_sql_select_query(template_request_response.data.sql) && !sql_tools.contains_offset_query(template_request_response.data.sql)){
-                        
-                        /*Se agrega la información de la plantilla de sentencia a la variable definida anteriormente*/
-                        query_templates.push(template_request_response.data)
-                        
-                    }
-
-                }
-
-            }
-
-            /*Se realiza una iteración sobre todos los elementos de la variable
-            que contiene la información de las plantillas de sentencia*/
-            for (const query_template of query_templates){
-            
-                /*Se define una variable que contiene la respuesta de la petición que se obtiene a partir de la
-                función de obtención de credenciales de acceso a postgreslq, con un token de acceso como parámetro*/
-                let parameters_requests_response = await query_service.get_postgresql_connection_parameters(access_token)
-
-                /*Se evalua si la respuesta de la petición fue exitosa*/
-                if(parameters_requests_response.status == 200){
-
-                    /*Se define una variable que contiene la información de los resultados de la sentencia*/
-                    await postgresql.execute_query(parameters_requests_response.data, query_template)
-
-                }
-
             }
 
         }

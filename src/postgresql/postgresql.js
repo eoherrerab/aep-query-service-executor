@@ -2,9 +2,9 @@
 const dotenv = require('dotenv')
 /*Se importa el módulo que permite conectar con bases de datos postgresql*/
 const pg = require('pg')
-
+/*Se importa el módulo que permite obtener la fecha actual*/
 const date = require('../../utils/date.js')
-
+/*Se importa el módulo que permite crear y escribir archivos CSV*/
 const csv = require('../../utils/csv.js')
 
 /*Se establece la configuración del archivo que contiene las variables de ambiente*/
@@ -61,11 +61,14 @@ async function execute_query(connection_parameters, query_template){
         'ssl': true
     })
 
+    /*Se define una variable que contiene el estado de ejecución de la consulta*/
     let is_querying_done = false
 
     /*Se define una variable que contiene la respuesta de la sentencia*/
     let query_results
 
+    /*Se define una variable que contiene el nombre del archivo
+    CSV a crear o, en su defecto, a sobreescribir*/
     let csv_file_name = query_template.id + "_At_" + date.get_datetime() + ".csv"
 
     /*Se despliega un fragmento de código con un try...catch*/
@@ -109,10 +112,14 @@ async function execute_query(connection_parameters, query_template){
             la consulta sobre la conexión a la base de datos*/
             query_results = await client.query(sql_query + ` LIMIT ${limit} OFFSET ${offset}`)
 
+            /*Se evalua si la respuesta de la sentecia contiene un campo específico*/
             if(query_results.rows){
 
+                /*Se evalua si la longitud del campo es mayor a cero*/
                 if(query_results.rows.length > 0){
 
+                    /*Se ejecuta la función de escritura, con el nombre del
+                    archivo CSV y el resultado de la consulta como parámetros*/
                     csv.write_csv_file(csv_file_name, query_results.rows)
                 
                 }
@@ -126,6 +133,7 @@ async function execute_query(connection_parameters, query_template){
         al final de los registros que se obtienen de respuesta de la sentencia*/
         }while(!is_query_result_over_yet(query_results.rowCount))
 
+        /*Se establece la variable definida anteriormente con un valor verdadero*/
         is_querying_done = true
 
     /*Se realiza una obtención del error ocurrido*/

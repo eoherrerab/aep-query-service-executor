@@ -15,6 +15,7 @@
     "fast-csv": "^5.0.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.5",
-    "sql-parser-cst": "^0.28.0"
+    "sql-parser-cst": "^0.28.0",
+    "underscore": "^1.13.6"
   }
 }
