@@ -79,7 +79,9 @@ function contains_offset_query(sql_query){
               }
             )
 
-
+            /*Se define la variable definida anteriormente como la obtención de
+            propiedades relacionadas a las palabras claves OFFSET o LIMIT en la
+            sentencia*/
             contains_offset = parser.statements[0].clauses.some(person => person.hasOwnProperty('offsetKw') || person.hasOwnProperty('limitKw'))
 
         /*Se realiza una obtención del error ocurrido*/

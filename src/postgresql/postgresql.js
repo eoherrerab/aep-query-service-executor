@@ -50,7 +50,7 @@ function replace_sql_query_parameters(sql_query, sql_query_parameters){
 
 /*Se define una función de ejecución de sentencias*/
 async function execute_query(connection_parameters, query_template){
-    
+
     /*Se define una variable que contiene los parámetros requeridos para conectar con la base de datos postgresql*/
     const client = new pg.Client({
         'user': connection_parameters.username,
@@ -124,7 +124,7 @@ async function execute_query(connection_parameters, query_template){
                 
                 }
             }
-            
+
             /*Se establece la variable como la variable misma,
             más la suma del límite para cada iteración*/
             offset = offset + limit
