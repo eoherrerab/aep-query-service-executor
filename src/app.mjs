@@ -1,21 +1,27 @@
-/*Se importa el módulo que permite cargar las variables de ambiente*/
-const dotenv = require('dotenv')
-/*Se importa el módulo que permite manipular arreglos*/
-const underscore = require('underscore')
-/*Se importa el módulo que permite generar tokens de acceso para Experience Platform API*/
-const access_token_generator = require('./aep-api-auth/adobelogin.js')
-/*Se importa el módulo que permite interactuar con la Query Service API de Experience Platform*/
-const query_service = require('./aep-api/query_service.js')
-/*Se importa el módulo que permite validar sentencias SQL*/
-const sql_tools = require('../utils/sql.js')
-/*Se importa el módulo que permite conectar a base de datos postgresql y ejecutar sentencias SQL */
-const postgresql = require('../src/postgresql/postgresql.js')
+// Se importa el módulo que permite cargar las variables de ambiente
+import dotenv from 'dotenv';
+// Se importa el módulo que permite manipular arreglos
+import underscore from 'underscore';
+// Se importa el módulo que permite generar tokens de acceso para Experience Platform API
+import access_token_generator from './aep-api-auth/adobelogin.js';
+// Se importa el módulo que permite interactuar con la Query Service API de Experience Platform
+import query_service from './aep-api/query_service.js';
+// Se importa el módulo que permite limitar la cantidad de ejecuciones de promesas al mismo tiempo
+import pLimit from 'p-limit';
+// Se importa el módulo que permite validar sentencias SQL
+import sql_tools from '../utils/sql.js';
+// Se importa el módulo que permite conectar a base de datos postgresql y ejecutar sentencias SQL
+import postgresql from './postgresql/postgresql.js';
 
 /*Se establece la configuración del archivo que contiene las variables de ambiente*/
-dotenv.config({path: ['config/aep.env']})
+dotenv.config({path: ['config/aep.env', 'config/pg.env']})
 
 /*Se define una función principal con un entorno asincrónico*/
 async function main(){
+
+    /*Se define una variable que contiene la cantidad maxima
+    de promesas que se pueden ejecutar al mismo tiempo*/
+    const limit = pLimit(parseInt(process.env.EXECUTION_LIMIT))
 
     try{
 
@@ -60,13 +66,13 @@ async function main(){
             /*Se establece la variable definida anteriormente como la misma, removiendo los elementos que sean vacíos*/
             query_templates_ids = query_templates_ids.filter(query_template_id => query_template_id != "")
 
-            /*Se establece la variable definida anteriormente como la misma, removiendo los elementos repetidos*/
+            /*Se establece la variable definida anteriormente como la misma, removiendo los elementos duplicados*/
             query_templates_ids = underscore.uniq(query_templates_ids)
 
             /*Se define una variable que contiene la información de las plantillas de las sentencias a partir de la función
             asincrónica de obtención de información de las plantillas de sentencias, con un token de acceso y la ID de la
             plantilla como parámetro*/
-            let query_templates = await Promise.all(query_templates_ids.map(query_template_id => query_service.get_query_template(access_token, query_template_id)))
+            let query_templates = await Promise.all(query_templates_ids.map(query_template_id => limit(() => query_service.get_query_template(access_token, query_template_id))))
 
             /*Se establece la variable definida anteriormente como la misma, removiendo las peticiones no exitosas*/
             query_templates = query_templates.filter(query_template => query_template.status == 200)
@@ -86,7 +92,7 @@ async function main(){
 
                 /*Se ejecuta la función asincrónica de consulta en la base de datos,
                 con los datos de conexión y la plantilla de sentencia como parámetro*/
-                await Promise.all(query_templates.map(query_template => postgresql.execute_query(parameters_requests_response.data, query_template.data)))
+                await Promise.all(query_templates.map(query_template => limit(() => postgresql.execute_query(parameters_requests_response.data, query_template.data))))
                 
             }
 
