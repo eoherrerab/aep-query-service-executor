@@ -63,12 +63,13 @@ Finalmente, se accede al archivo *pg.env* y se debe de ingresar las configuracio
 |Nombre de variable de ambiente|Descripción|Donde obtener este valor|
 |--|--|--|
 |BATCH_LIMIT|Limite de líneas por consulta. Como se comentó anteriormente, la cantidad máxima de registros que puede retornar un resultado de consulta son 50.000. Este valor está definido en la documentación y no es manipulable por el usuario, sin embargo, esto está sujeto a cambios realizados por el equipo de Experience Platform|Predefinido por el archivo de ambiente, sujeto a cambios realizados por Adobe|
+|EXECUTION_LIMIT|Limite de consultas concurrentes. Este valor está definido en base a las pruebas realizadas, sin embargo, esto está sujeto a cambios según necesidad, recursos de computo disponibles, entre otros factores|Predefinido por el archivo de ambiente, sujeto a cambios realizados por el usuario| 
 
 ## Limitantes
  
-- Solamente puede ejecutar de tipo SELECT. Esto para evitar crear sentencias, como UPDATE O DELETE, que puedan alterar la estructura y estabilidad de la base de datos y, en consecuencia, la instancia de Adobe Experience Platform.
+- Solamente puede ejecutar de tipo SELECT. Esto para evitar crear sentencias, como UPDATE O DELETE, que puedan alterar la estructura y estabilidad de la base de datos y, en consecuencia, la instancia de Adobe Experience Platform. Al intentar utilizar un Query Template ID asociado a una consulta diferente a un SELECT, esta será descartada mediante los filtros aplicados internamente en este script y, en consecuencia, no se ejecutará.
 
-- Las sentencias no pueden contener FETCH, LIMIT, OFFSET u otras palabras claves que cumplan estas funciones. Esto es debido a que, como se mencionó anteriormente, este script utiliza palabras claves LIMIT y OFFSET para obtener los valores completos de la sentencia, superando ese limite de 50000 registros por consulta.
+- Las sentencias no pueden contener FETCH, LIMIT, OFFSET u otras palabras claves que cumplan estas funciones. Esto es debido a que, como se mencionó anteriormente, este script utiliza palabras claves LIMIT y OFFSET para obtener los valores completos de la sentencia, superando ese limite de 50000 registros por consulta. Al intentar utilizar un Query Template ID asociado a una consulta que contenga palabras claves FETCH, LIMIT, OFFSET, entre otras, esta será descartada mediante los filtros aplicados internamente en este script y, en consecuencia, no se ejecutará.
 
 ## Casos de uso
 
