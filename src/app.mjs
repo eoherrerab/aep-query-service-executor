@@ -19,11 +19,11 @@ dotenv.config({path: ['config/aep.env', 'config/pg.env']})
 /*Se define una función principal con un entorno asincrónico*/
 async function main(){
 
-    /*Se define una variable que contiene la cantidad maxima
-    de promesas que se pueden ejecutar al mismo tiempo*/
-    const limit = pLimit(parseInt(process.env.EXECUTION_LIMIT))
-
     try{
+
+        /*Se define una variable que contiene la cantidad maxima
+        de promesas que se pueden ejecutar al mismo tiempo*/
+        const limit = pLimit(parseInt(process.env.EXECUTION_LIMIT))
 
         /*Se define una variable que contiene la información de la respuesta de
         la petición especificamente el valor correspondiente al token de acceso*/
