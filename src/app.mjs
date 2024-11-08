@@ -92,8 +92,8 @@ async function main(){
 
                 /*Se ejecuta la función asincrónica de consulta en la base de datos,
                 con los datos de conexión y la plantilla de sentencia como parámetro*/
-                await Promise.all(query_templates.map(query_template => limit(() => postgresql.execute_query(parameters_requests_response.data, query_template.data))))
-                
+                await Promise.allSettled(query_templates.map(query_template => limit(() => postgresql.execute_query(parameters_requests_response.data, query_template.data))))
+            
             }
 
         }
